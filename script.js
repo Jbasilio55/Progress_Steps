@@ -22,6 +22,10 @@ nextBtn.textContent = "Next";
 document.body.appendChild(container);
 container.appendChild(progressContainer);
 progressContainer.appendChild(progress);
+container.appendChild(prevBtn);
+container.appendChild(nextBtn);
+
+let currentActive = 1;
 
 function render() {
   let progressHtml = "";
@@ -34,9 +38,45 @@ function render() {
     }
   }
 
-  progressContainer.innerHTML += progressHtml;
-  container.appendChild(prevBtn);
-  container.appendChild(nextBtn);
+  progressContainer.innerHTML += progressHtml; // Use innerHTML instead of innerHTML +=
+  update(); // Call update to set the progress width initially
 }
 
-render();
+function update() {
+  const circles = document.querySelectorAll(".circle"); // Re-select circles after rendering
+
+  circles.forEach((circle, idx) => {
+    if (idx < currentActive) {
+      circle.classList.add("active");
+    } else {
+      circle.classList.remove("active");
+    }
+  });
+
+  const actives = document.querySelectorAll(".active");
+  progress.style.width = (actives.length / circles.length) * 100 + "%";
+
+  // Enable/disable buttons based on currentActive
+  prevBtn.disabled = currentActive === 1;
+  nextBtn.disabled = currentActive === circles.length;
+}
+
+nextBtn.addEventListener("click", function () {
+  currentActive++;
+  if (currentActive > 4) {
+    currentActive = 4; // Prevent going beyond the last circle
+    return;
+  }
+  update();
+});
+
+prevBtn.addEventListener("click", function () {
+  currentActive--;
+  if (currentActive < 1) {
+    currentActive = 1; // Prevent going below the first circle
+    return;
+  }
+  update();
+});
+
+render(); // Initial render
